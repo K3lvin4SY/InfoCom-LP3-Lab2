@@ -21,11 +21,14 @@ region = ", Lund, Skåne, Sweden"
 
 # Example to send coords as request to the drone
 def send_request(drone_url, coords):
+    print(coords)
     with requests.Session() as session:
         resp = session.post(drone_url, json=coords)
+        print(resp)
 
 @app.route('/planner', methods=['POST'])
 def route_planner():
+    print("run")
     Addresses =  json.loads(request.data.decode())
     FromAddress = Addresses['faddr']
     ToAddress = Addresses['taddr']
@@ -47,7 +50,7 @@ def route_planner():
             'to': (
                 to_location.longitude,
                 to_location.latitude
-            ),
+            )
         }
         # ======================================================================
         # Here you need to find a drone that is availale from the database. You need to check the status of the drone, there are two status, 'busy' or 'idle', only 'idle' drone is available and can be sent the coords to run delivery
@@ -58,6 +61,8 @@ def route_planner():
             droneData = redis_server.hgetall(drone)
             if droneData['status'] == 'idle':
                 droneAvailable = drone
+                coords['current'] = (droneData['longitude'], droneData['latitude'])
+                break
 
         # if no drone is availble:
         if droneAvailable == None:

@@ -57,13 +57,15 @@ def get_drones():
     drones = redis_server.smembers("drones")
     for drone in drones:
         droneData = redis_server.hgetall(drone)
+        (longitude_svg, latitude_svg) = translate( (float(droneData['longitude']), float(droneData['latitude'])) )
         drone_dict.update({
             drone: {
-                'longitude': float(droneData['longitude']),
-                'latitude': float(droneData['latitude']),
+                'longitude': longitude_svg,
+                'latitude': latitude_svg,
                 'status': droneData['status']
             }
         })
+    print(drone_dict)
     return jsonify(drone_dict)
 
 if __name__ == "__main__":

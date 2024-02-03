@@ -2,7 +2,11 @@ from flask import Flask, request
 from flask_cors import CORS
 import subprocess
 import  requests
-
+from simulator import idle
+from sense_hat import SenseHat
+sense = SenseHat()
+sense.clear()
+sense.low_light = True
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -31,6 +35,7 @@ drone_info = {'id': myID,
 SERVER="http://10.0.76.19:5001/drone"
 with requests.Session() as session:
     resp = session.post(SERVER, json=drone_info)
+    sense.set_pixels(idle)
 #===================================================================
 
 @app.route('/', methods=['POST'])

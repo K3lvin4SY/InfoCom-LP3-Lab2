@@ -35,6 +35,7 @@ drone_info = {'id': myID,
 SERVER="http://10.0.76.20:5001/drone"
 with requests.Session() as session:
     resp = session.post(SERVER, json=drone_info)
+    sense.clear()
     sense.set_pixels(idle)
 #===================================================================
 

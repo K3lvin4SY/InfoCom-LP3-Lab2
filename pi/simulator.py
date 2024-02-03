@@ -361,7 +361,7 @@ def run(id, current_coords, from_coords, to_coords, SERVER_URL):
 
     # Move from current_coodrs to from_coords
     d_long, d_la =  getMovement(drone_coords, from_coords)
-    loopAmount = 0
+    loopAmount = 0.0
     startSound("../pygame-music/coin.wav")
     while pygame.mixer.music.get_busy() == True:
         continue
@@ -370,18 +370,17 @@ def run(id, current_coords, from_coords, to_coords, SERVER_URL):
         drone_coords = moveDrone(drone_coords, d_long, d_la)
         send_location(SERVER_URL, id=id, drone_coords=drone_coords, status='busy')
 
-        sense.set_pixels(busyFrames[(loopAmount % 1) % len(busyFrames)])
-        loopAmount += 1
+        sense.set_pixels(busyFrames[int(loopAmount // 1) % len(busyFrames)])
+        loopAmount += 0.5
 
     # package arrived to currier
     send_location(SERVER_URL, id=id, drone_coords=drone_coords, status='waiting')
     startSound("../pygame-music/doorbell-1.wav")
     # wait for human intercation
-    loopAmount = 0
+    loopAmount = 0.0
     exit_loop = False
     while not exit_loop:
         for key in sense.stick.get_events():
-            print(key.direction)
             if key.direction == "middle":
                 startSound("../pygame-music/coin.wav")
                 sense.clear()
@@ -389,29 +388,30 @@ def run(id, current_coords, from_coords, to_coords, SERVER_URL):
                 while pygame.mixer.music.get_busy() == True:
                     continue
                 break
-        sense.set_pixels(loadPackageFrames[(loopAmount % 1) % len(loadPackageFrames)])
-        loopAmount += 1
+        sense.set_pixels(loadPackageFrames[int(loopAmount // 1) % len(loadPackageFrames)])
+        loopAmount += 0.5
 
     # Move from from_coodrs to to_coords
     d_long, d_la =  getMovement(drone_coords, to_coords)
-    loopAmount = 0
+    loopAmount = 0.0
     startSound("../pygame-music/space-odyssey.mp3")
     while distance(drone_coords, to_coords) > 0.0002:
         drone_coords = moveDrone(drone_coords, d_long, d_la)
         send_location(SERVER_URL, id=id, drone_coords=drone_coords, status='busy')
 
-        sense.set_pixels(busyFrames[(loopAmount % 1) % len(busyFrames)])
-        loopAmount += 1
+        sense.set_pixels(busyFrames[int(loopAmount // 1) % len(busyFrames)])
+        loopAmount += 0.5
     
     # package arrived to destination
     send_location(SERVER_URL, id=id, drone_coords=drone_coords, status='waiting')
     startSound("../pygame-music/doorbell.mp3")
     # wait for human intercation
-    loopAmount = 0
+    loopAmount = 0.0
     exit_loop = False
+    sense.clear()
+    sense.stick.get_events() ## needs this or it wont work for some unknown reason O_O
     while not exit_loop:
         for key in sense.stick.get_events():
-            print(key.direction)
             if key.direction == "middle":
                 startSound("../pygame-music/coin.wav")
                 sense.clear()
@@ -419,8 +419,8 @@ def run(id, current_coords, from_coords, to_coords, SERVER_URL):
                 while pygame.mixer.music.get_busy() == True:
                     continue
                 break
-        sense.set_pixels(loadPackageFrames[::-1][(loopAmount % 1) % len(loadPackageFrames)])
-        loopAmount += 1
+        sense.set_pixels(loadPackageFrames[::-1][int(loopAmount // 1) % len(loadPackageFrames)])
+        loopAmount += 0.5
         
     # Stop and update status to database
     send_location(SERVER_URL, id=id, drone_coords=drone_coords, status='idle')

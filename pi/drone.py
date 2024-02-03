@@ -32,7 +32,7 @@ drone_info = {'id': myID,
 
 # Fill in the IP address of server, and send the initial location of the drone to the SERVER
 #===================================================================
-SERVER="http://10.0.76.19:5001/drone"
+SERVER="http://10.0.76.20:5001/drone"
 with requests.Session() as session:
     resp = session.post(SERVER, json=drone_info)
     sense.set_pixels(idle)

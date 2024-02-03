@@ -25,8 +25,7 @@
           }
         }
       };
-      console.log("test")
-      xhttp.open("POST", "http://10.0.76.19:5002/planner", true);
+      xhttp.open("POST", "http://127.0.0.1:5002/planner", true);
       xhttp.send(JSON.stringify(data));
     }
   </script>
@@ -40,6 +39,9 @@
       var color = 'red';
       if (status == 'idle'){
         color = 'green'
+      }
+      if (status == 'waiting'){
+        color = 'yellow'
       }
       if(circleNode == null){
         circleNode = doc_svg.createElementNS("http://www.w3.org/2000/svg", "circle");

@@ -17,35 +17,37 @@ def moveDrone(src, d_long, d_la):
     y = y + d_la        
     return (x, y)
 
+def send_location(SERVER_URL, id, drone_coords, status):
+    with requests.Session() as session:
+        drone_info = {'id': id,
+                      'longitude': drone_coords[0],
+                      'latitude': drone_coords[1],
+                       'status': status
+                    }
+        resp = session.post(SERVER_URL, json=drone_info)
+
+def distance(_fr, _to):
+    _dist = ((_to[0] - _fr[0])**2 + (_to[1] - _fr[1])**2)*10**6
+    return _dist
+        
 def run(id, current_coords, from_coords, to_coords, SERVER_URL):
     drone_coords = current_coords
+
+    # Move from current_coodrs to from_coords
     d_long, d_la =  getMovement(drone_coords, from_coords)
-    while ((from_coords[0] - drone_coords[0])**2 + (from_coords[1] - drone_coords[1])**2)*10**6 > 0.0002:
+    while distance(drone_coords, from_coords) > 0.0002:
         drone_coords = moveDrone(drone_coords, d_long, d_la)
-        with requests.Session() as session:
-            drone_info = {'id': id,
-                          'longitude': drone_coords[0],
-                          'latitude': drone_coords[1],
-                          'status': 'busy'
-                        }
-            resp = session.post(SERVER_URL, json=drone_info)
+        send_location(SERVER_URL, id=id, drone_coords=drone_coords, status='busy')
+
+    # Move from from_coodrs to to_coords
     d_long, d_la =  getMovement(drone_coords, to_coords)
-    while ((to_coords[0] - drone_coords[0])**2 + (to_coords[1] - drone_coords[1])**2)*10**6 > 0.0002:
+    while distance(drone_coords, to_coords) > 0.0002:
         drone_coords = moveDrone(drone_coords, d_long, d_la)
-        with requests.Session() as session:
-            drone_info = {'id': id,
-                          'longitude': drone_coords[0],
-                          'latitude': drone_coords[1],
-                          'status': 'busy'
-                        }
-            resp = session.post(SERVER_URL, json=drone_info)
-    with requests.Session() as session:
-            drone_info = {'id': id,
-                          'longitude': drone_coords[0],
-                          'latitude': drone_coords[1],
-                          'status': 'idle'
-                         }
-            resp = session.post(SERVER_URL, json=drone_info)
+        send_location(SERVER_URL, id=id, drone_coords=drone_coords, status='busy')
+    
+    # Stop and update status to database
+    send_location(SERVER_URL, id=id, drone_coords=drone_coords, status='idle')
+    
     return drone_coords[0], drone_coords[1]
    
 if __name__ == "__main__":
@@ -68,7 +70,8 @@ if __name__ == "__main__":
     from_coords = (args.flong, args.flat)
     to_coords = (args.tlong, args.tlat)
 
-    print(current_coords, from_coords, to_coords)
+    print("Get New Task!")
+
     drone_long, drone_lat = run(args.id ,current_coords, from_coords, to_coords, SERVER_URL)
     # drone_long and drone_lat is the final location when drlivery is completed, find a way save the value, and use it for the initial coordinates of next delivery
     #=============================================================================

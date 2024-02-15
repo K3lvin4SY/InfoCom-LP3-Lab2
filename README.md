@@ -4,6 +4,12 @@ Intall the requied Python packages, redis is added in the list
 pip3 install -r requirements.txt
 ```
 
+## Setup:
+In `/pi`:
+Change SERVER_IP to the ip of your pi server in both `drone.py` & `simulstor.py`
+
+Now to code should work completely if the network configuration is setup correct. =)
+
 ## On the Server Pi:
 Go to `/webserver`, start your Redis server and run the two flask servers:
 1. On Terminal 1, start your redis server
